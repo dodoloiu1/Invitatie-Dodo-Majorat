@@ -357,11 +357,14 @@ body::before {
       <div class="cyber-border p-6 flex flex-col gap-5">
         <span class="text-[#00e639]" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.2em;font-weight:700">CÂMP_02 / PREZENȚĂ</span>
         <p class="text-primary" style="font-family:Sora;font-size:21px;font-weight:600;line-height:1.3">Vii la petrecere?</p>
-        <div class="grid grid-cols-2 gap-3">
-          <button class="opt-btn flex items-center gap-2" onclick="selectAttend(true, this)">
+        <div class="flex flex-col gap-3">
+          <button class="opt-btn flex items-center gap-2" onclick="selectAttend('yes', this)">
             <span class="material-symbols-outlined text-[#00dbe7]" style="font-size:16px">check_circle</span>DA, VIN!
           </button>
-          <button class="opt-btn danger flex items-center gap-2" onclick="selectAttend(false, this)">
+          <button class="opt-btn flex items-center gap-2" onclick="selectAttend('maybe', this)" style="border-color:rgba(229,181,255,0.25);">
+            <span class="material-symbols-outlined text-[#e5b5ff]" style="font-size:16px">help</span>Nu știu încă / Poate
+          </button>
+          <button class="opt-btn danger flex items-center gap-2" onclick="selectAttend('no', this)">
             <span class="material-symbols-outlined text-[#ff6eb4]" style="font-size:16px">cancel</span>Nu pot
           </button>
         </div>
@@ -524,7 +527,8 @@ function selectAttend(val, btn) {
   document.querySelectorAll('#q1 .opt-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   state.attending = val;
-  setTimeout(() => val ? showQ(2) : submitResponse(), 380);
+  // yes and maybe go to diet, no skips straight to submit
+  setTimeout(() => (val === 'yes' || val === 'maybe') ? showQ(2) : submitResponse(), 380);
 }
 
 // ─── Q2 ─────────────────────────────────────
@@ -557,7 +561,7 @@ async function submitResponse() {
   const payload = {
     name: state.name,
     attending: state.attending,
-    diet: state.attending ? (state.diet === 'other' ? state.dietOther : state.diet) : null,
+    diet: (state.attending === 'yes' || state.attending === 'maybe') ? (state.diet === 'other' ? state.dietOther : state.diet) : null,
     submitted_at: new Date().toISOString()
   };
 
@@ -575,7 +579,7 @@ async function submitResponse() {
   const titleEl = document.getElementById('success-title');
   const msgEl   = document.getElementById('success-msg');
 
-  if (state.attending) {
+  if (state.attending === 'yes') {
     iconEl.textContent = 'check_circle';
     iconEl.style.color = '#00dbe7';
     iconWrap.style.borderColor = '#00dbe7';
@@ -583,6 +587,15 @@ async function submitResponse() {
     titleEl.textContent = 'ÎNREGISTRAT';
     titleEl.style.color = '#e1fdff';
     msgEl.innerHTML = 'Răspunsul tău a fost transmis cu succes.<br/>Ne vedem pe 20 iunie! 🎉';
+    msgEl.style.color = '#b9cacb';
+  } else if (state.attending === 'maybe') {
+    iconEl.textContent = 'help';
+    iconEl.style.color = '#e5b5ff';
+    iconWrap.style.borderColor = '#e5b5ff';
+    iconWrap.style.boxShadow = '0 0 30px rgba(229,181,255,0.4)';
+    titleEl.textContent = 'SPER SĂ POȚI VENI!';
+    titleEl.style.color = '#e5b5ff';
+    msgEl.innerHTML = 'Răspunsul tău a fost înregistrat.<br/>Sper că o să poți veni, te aștept! 🤞';
     msgEl.style.color = '#b9cacb';
   } else {
     iconEl.textContent = 'cancel';
