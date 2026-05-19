@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html class="dark" lang="ro">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DODO'S 18TH</title>
+<script src="https://cdn.tailwindcss.com/3.4.1"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@600;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface-container-highest": "#353534",
+        "surface-dim": "#131313",
+        "surface-container-high": "#2a2a2a",
+        "on-surface-variant": "#b9cacb",
+        "surface": "#131313",
+        "primary": "#e1fdff",
+        "on-secondary-container": "#f7e1ff",
+        "background": "#131313",
+        "secondary-container": "#a100f0",
+        "primary-fixed-dim": "#00dbe7",
+        "primary-container": "#00f2ff",
+        "surface-container-lowest": "#0e0e0e",
+        "tertiary-container": "#00fd40",
+        "surface-container": "#201f1f",
+        "on-background": "#e5e2e1",
+        "secondary-fixed": "#f4d9ff",
+        "secondary": "#e5b5ff",
+        "on-secondary": "#4e0078",
+        "inverse-surface": "#e5e2e1",
+        "surface-container-low": "#1c1b1b",
+        "primary-fixed": "#74f5ff",
+        "tertiary-fixed-dim": "#00e639",
+        "surface-variant": "#353534",
+        "outline": "#849495",
+        "surface-bright": "#3a3939",
+        "outline-variant": "#3a494b",
+        "on-surface": "#e5e2e1",
+        "tertiary-fixed": "#72ff70",
+        "on-primary": "#00363a",
+        "secondary-fixed-dim": "#e5b5ff"
+      },
+      borderRadius: {
+        "DEFAULT": "0.125rem",
+        "lg": "0.25rem",
+        "xl": "0.5rem",
+        "full": "0.75rem"
+      },
+      fontFamily: {
+        "headline-md": ["Sora"],
+        "code-sm": ["JetBrains Mono"],
+        "body-base": ["JetBrains Mono"],
+        "display-lg": ["Sora"],
+        "label-caps": ["JetBrains Mono"]
+      }
+    }
+  }
+}
+</script>
+<style>
+body {
+  background-color: #131313;
+  background-image:
+    linear-gradient(rgba(0,219,231,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,219,231,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%);
+  background-size: 100% 4px;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.3;
+}
+.cyber-border {
+  position: relative;
+  border: 1px solid rgba(0,219,231,0.3);
+  background: rgba(20,20,20,0.7);
+  backdrop-filter: blur(12px);
+}
+.cyber-border::before, .cyber-border::after {
+  content: '';
+  position: absolute;
+  width: 8px; height: 8px;
+  border: 1px solid #00dbe7;
+}
+.cyber-border::before { top:-1px; left:-1px; border-right:none; border-bottom:none; }
+.cyber-border::after  { bottom:-1px; right:-1px; border-left:none; border-top:none; }
+
+.cyber-button {
+  border: 1px solid #00dbe7;
+  box-shadow: 0 0 15px rgba(0,219,231,0.2);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.cyber-button:hover {
+  background: linear-gradient(90deg, rgba(0,219,231,0.2), rgba(161,0,240,0.2)) !important;
+  box-shadow: 0 0 30px rgba(0,219,231,0.5);
+}
+.cyber-button:active { transform: scale(0.98); }
+
+.glitch-text {
+  position: relative;
+  text-shadow: 2px 0 rgba(0,219,231,0.5), -2px 0 rgba(161,0,240,0.5);
+  animation: glitch 5s infinite;
+}
+@keyframes glitch {
+  0%,88%,100% { text-shadow: 2px 0 rgba(0,219,231,0.5), -2px 0 rgba(161,0,240,0.5); }
+  90% { text-shadow: -5px 0 rgba(0,219,231,0.9), 5px 0 rgba(161,0,240,0.9); }
+  92% { text-shadow: 5px 0 rgba(0,219,231,0.9), -5px 0 rgba(161,0,240,0.9); }
+  94% { text-shadow: 2px 0 rgba(0,219,231,0.5), -2px 0 rgba(161,0,240,0.5); }
+}
+
+.blinking-cursor::after {
+  content: '_';
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.opt-btn {
+  border: 1px solid rgba(0,219,231,0.25);
+  background: rgba(14,14,14,0.8);
+  color: #b9cacb;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  padding: 0.9rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: left;
+  position: relative;
+  width: 100%;
+}
+.opt-btn::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:3px;
+  background:#00dbe7;
+  transform:scaleY(0);
+  transition:transform 0.18s;
+}
+.opt-btn:hover { border-color:#00dbe7; color:#e1fdff; background:rgba(0,219,231,0.07); }
+.opt-btn:hover::before { transform:scaleY(1); }
+.opt-btn.selected {
+  border-color:#00dbe7;
+  color:#74f5ff;
+  background:rgba(0,219,231,0.1);
+  box-shadow:0 0 15px rgba(0,219,231,0.2);
+}
+.opt-btn.selected::before { transform:scaleY(1); }
+.opt-btn.danger { border-color:rgba(255,0,110,0.25); }
+.opt-btn.danger:hover, .opt-btn.danger.selected {
+  border-color:#ff006e;
+  color:#ff6eb4;
+  background:rgba(255,0,110,0.07);
+  box-shadow:0 0 15px rgba(255,0,110,0.2);
+}
+.opt-btn.danger::before { background:#ff006e; }
+.opt-btn.danger:hover::before, .opt-btn.danger.selected::before { transform:scaleY(1); }
+
+.cyber-input {
+  width:100%;
+  background:#0e0e0e !important;
+  border:1px solid rgba(0,219,231,0.25);
+  color:#e1fdff !important;
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  padding:0.9rem 1rem;
+  outline:none;
+  transition:border-color 0.2s, box-shadow 0.2s;
+  letter-spacing:0.05em;
+  -webkit-text-fill-color: #e1fdff !important;
+  caret-color: #00dbe7;
+}
+.cyber-input:focus { border-color:#00dbe7; box-shadow:0 0 20px rgba(0,219,231,0.12); }
+.cyber-input::placeholder { color:#526a6b; -webkit-text-fill-color: #526a6b !important; }
+.cyber-input:-webkit-autofill,
+.cyber-input:-webkit-autofill:hover,
+.cyber-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #0e0e0e inset !important;
+  -webkit-text-fill-color: #e1fdff !important;
+  caret-color: #00dbe7;
+  border-color: #00dbe7;
+}
+
+.progress-track { height:2px; background:rgba(0,219,231,0.1); width:100%; }
+.progress-fill { height:2px; background:#00dbe7; box-shadow:0 0 8px #00dbe7; transition:width 0.5s ease; }
+
+.q-slide { display:none; }
+.q-slide.active { display:block; animation:slideUp 0.35s ease forwards; }
+@keyframes slideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+.page { display:none; }
+.page.active { display:flex; }
+
+.load-dot { animation:loadDot 1.2s infinite; }
+.load-dot:nth-child(1){animation-delay:0s}
+.load-dot:nth-child(2){animation-delay:0.2s}
+.load-dot:nth-child(3){animation-delay:0.4s}
+@keyframes loadDot {
+  0%,80%,100%{opacity:0.2;transform:scale(0.7)}
+  40%{opacity:1;transform:scale(1)}
+}
+</style>
+</head>
+<body class="text-on-background min-h-screen flex flex-col font-body-base overflow-x-hidden" style="font-family:'JetBrains Mono',monospace">
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-5 md:px-10 py-4 bg-[#131313]/80 backdrop-blur-xl border-b border-[#00dbe7]/20 shadow-[0_0_15px_rgba(0,219,231,0.25)]">
+  <div class="text-primary tracking-tighter uppercase cursor-pointer" style="font-family:Sora;font-weight:800;font-size:clamp(1rem,3vw,1.5rem)" onclick="goBack()">DODO'S 18TH</div>
+  <div class="hidden md:flex gap-4 items-center">
+    <span class="text-[#b9cacb]" style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:0.2em">SIGNATURE EVENTS // 20.06.2026 // 20:00</span>
+  </div>
+  <button class="cyber-button px-5 py-2 text-primary hidden md:block" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.2em;font-weight:700" onclick="goToForm()">COMPLETEAZĂ</button>
+  <button class="md:hidden text-primary" onclick="goToForm()">
+    <span class="material-symbols-outlined">terminal</span>
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     LANDING PAGE
+══════════════════════════════════════ -->
+<div id="page-landing" class="page active flex-grow flex-col items-center justify-center pt-32 pb-20 px-5 md:px-10 z-10">
+  <div class="max-w-5xl w-full flex flex-col items-center text-center gap-10">
+
+    <!-- Terminal init tag -->
+    <div class="cyber-border p-3 px-5 inline-block">
+      <span class="text-[#00e639] blinking-cursor" style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:0.04em">&gt; // INVITATION_PROTOCOL_v18.0 INITIALIZED</span>
+    </div>
+
+    <!-- Main title -->
+    <div class="flex flex-col items-center gap-3">
+      <h1 class="glitch-text text-primary uppercase" style="font-family:Sora;font-weight:800;font-size:clamp(2.4rem,9vw,5.5rem);line-height:1.05;letter-spacing:-0.03em">
+        DODO'S 18TH BIRTHDAY
+      </h1>
+      <p class="text-[#b9cacb] tracking-[0.3em]" style="font-family:'JetBrains Mono';font-size:12px">[ EIGHTEEN YEARS ONLINE ]</p>
+    </div>
+
+    <!-- Info cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mt-2">
+      <div class="cyber-border p-8 flex flex-col items-center gap-4">
+        <span class="material-symbols-outlined text-[#00dbe7]" style="font-size:2.2rem">calendar_month</span>
+        <h3 class="text-[#b9cacb]" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.25em;font-weight:700">DATE</h3>
+        <p class="text-primary" style="font-family:Sora;font-size:26px;font-weight:600;line-height:1.25;letter-spacing:0.04em">20 IUNIE<br/>2026</p>
+      </div>
+      <div class="cyber-border p-8 flex flex-col items-center gap-4">
+        <span class="material-symbols-outlined text-[#f4d9ff]" style="font-size:2.2rem">schedule</span>
+        <h3 class="text-[#b9cacb]" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.25em;font-weight:700">TIME</h3>
+        <p class="text-[#f4d9ff]" style="font-family:Sora;font-size:26px;font-weight:600;line-height:1.25">20:00<br/>— ??:??</p>
+      </div>
+      <div class="cyber-border p-8 flex flex-col items-center gap-4">
+        <span class="material-symbols-outlined text-[#72ff70]" style="font-size:2.2rem">location_on</span>
+        <h3 class="text-[#b9cacb]" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.25em;font-weight:700">PLACE</h3>
+        <p class="text-[#72ff70]" style="font-family:'JetBrains Mono';font-size:13px;line-height:1.7">Signature Events<br/>Str. Popa Lazăr 5-25</p>
+        <a href="https://maps.app.goo.gl/zXfx4huDaNR3qcA76" target="_blank" class="cyber-button px-4 py-2 flex items-center gap-2 w-full justify-center" style="text-decoration:none">
+          <span class="material-symbols-outlined text-[#72ff70]" style="font-size:16px">map</span>
+          <span style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.15em;color:#72ff70;font-weight:700">DESCHIDE PE MAPS</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="flex flex-col items-center gap-6 w-full mt-4">
+      <h2 class="text-[#b9cacb] tracking-[0.3em]" style="font-family:'JetBrains Mono';font-size:11px;font-weight:700">SYSTEM INITIALIZATION IN:</h2>
+      <div class="flex gap-3 md:gap-5">
+        <!-- DAYS -->
+        <div class="flex flex-col items-center gap-2">
+          <div class="cyber-border bg-[#0e0e0e] text-primary text-center" style="font-family:Sora;font-weight:800;font-size:clamp(2rem,7vw,4.5rem);line-height:1.1;letter-spacing:-0.04em;min-width:clamp(68px,13vw,128px);padding:1rem 0.5rem">
+            <span id="cd-days">--</span>
+          </div>
+          <span class="text-[#00dbe7]" style="font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:0.2em">ZILE</span>
+        </div>
+        <!-- HOURS -->
+        <div class="flex flex-col items-center gap-2">
+          <div class="cyber-border bg-[#0e0e0e] text-primary text-center" style="font-family:Sora;font-weight:800;font-size:clamp(2rem,7vw,4.5rem);line-height:1.1;letter-spacing:-0.04em;min-width:clamp(68px,13vw,128px);padding:1rem 0.5rem">
+            <span id="cd-hours">--</span>
+          </div>
+          <span class="text-[#00dbe7]" style="font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:0.2em">ORE</span>
+        </div>
+        <!-- MINS -->
+        <div class="flex flex-col items-center gap-2">
+          <div class="cyber-border bg-[#0e0e0e] text-primary text-center" style="font-family:Sora;font-weight:800;font-size:clamp(2rem,7vw,4.5rem);line-height:1.1;letter-spacing:-0.04em;min-width:clamp(68px,13vw,128px);padding:1rem 0.5rem">
+            <span id="cd-mins">--</span>
+          </div>
+          <span class="text-[#00dbe7]" style="font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:0.2em">MIN</span>
+        </div>
+        <!-- SECS -->
+        <div class="flex flex-col items-center gap-2">
+          <div class="cyber-border bg-[#0e0e0e] text-center" style="font-family:Sora;font-weight:800;font-size:clamp(2rem,7vw,4.5rem);line-height:1.1;letter-spacing:-0.04em;min-width:clamp(68px,13vw,128px);padding:1rem 0.5rem;color:#e5b5ff">
+            <span id="cd-secs">--</span>
+          </div>
+          <span style="font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:0.2em;color:#e5b5ff">SEC</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="w-full max-w-lg mt-4">
+      <button class="cyber-button w-full py-6 flex items-center justify-center gap-4 bg-[#00dbe7]/10" onclick="goToForm()">
+        <span class="material-symbols-outlined text-[#00dbe7]">terminal</span>
+        <span class="text-primary tracking-widest" style="font-family:Sora;font-weight:600;font-size:clamp(1rem,3vw,1.35rem)">&gt;&gt; COMPLETEAZĂ INVITAȚIA &lt;&lt;</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     FORM PAGE
+══════════════════════════════════════ -->
+<div id="page-form" class="page flex-grow flex-col items-center justify-center pt-28 pb-20 px-5 md:px-10 z-10">
+
+  <button class="fixed top-20 left-5 md:left-10 z-50 flex items-center gap-2 text-[#b9cacb] hover:text-primary transition-colors" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.15em;background:none;border:none;cursor:pointer" onclick="goBack()">
+    <span class="material-symbols-outlined text-base">arrow_back</span>BACK
+  </button>
+
+  <div class="max-w-lg w-full flex flex-col gap-8">
+
+    <!-- Form header -->
+    <div class="text-center flex flex-col items-center gap-3">
+      <div class="cyber-border p-3 px-5 inline-block">
+        <span class="text-[#00e639]" style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:0.05em">&gt; RSVP_PROTOCOL // INPUT REQUIRED</span>
+      </div>
+      <div class="progress-track w-full mt-2">
+        <div class="progress-fill" id="progress-bar" style="width:0%"></div>
+      </div>
+      <p class="text-[#849495]" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.2em" id="progress-label">STEP 0 / 3</p>
+    </div>
+
+    <!-- Q0: Nume -->
+    <div class="q-slide active" id="q0">
+      <div class="cyber-border p-6 flex flex-col gap-5">
+        <span class="text-[#00e639]" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.2em;font-weight:700">CÂMP_01 / IDENTIFICARE</span>
+        <p class="text-primary" style="font-family:Sora;font-size:21px;font-weight:600;line-height:1.3">Cum te cheamă?</p>
+        <div class="relative">
+          <input class="cyber-input" type="text" id="name-input" placeholder="// Numele tău" oninput="checkName()" autocomplete="off"/>
+        </div>
+        <button class="cyber-button py-3 px-6 text-primary w-full transition-all" id="name-next" style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:0.2em;font-weight:700;opacity:0.35;pointer-events:none" onclick="submitName()">
+          CONTINUĂ &nbsp;→
+        </button>
+      </div>
+    </div>
+
+    <!-- Q1: Vii? -->
+    <div class="q-slide" id="q1">
+      <div class="cyber-border p-6 flex flex-col gap-5">
+        <span class="text-[#00e639]" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.2em;font-weight:700">CÂMP_02 / PREZENȚĂ</span>
+        <p class="text-primary" style="font-family:Sora;font-size:21px;font-weight:600;line-height:1.3">Vii la petrecere?</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button class="opt-btn flex items-center gap-2" onclick="selectAttend(true, this)">
+            <span class="material-symbols-outlined text-[#00dbe7]" style="font-size:16px">check_circle</span>DA, VIN!
+          </button>
+          <button class="opt-btn danger flex items-center gap-2" onclick="selectAttend(false, this)">
+            <span class="material-symbols-outlined text-[#ff6eb4]" style="font-size:16px">cancel</span>Nu pot
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2: Diet -->
+    <div class="q-slide" id="q2">
+      <div class="cyber-border p-6 flex flex-col gap-5">
+        <span class="text-[#00e639]" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.2em;font-weight:700">CÂMP_03 / MENIU</span>
+        <p class="text-primary" style="font-family:Sora;font-size:21px;font-weight:600;line-height:1.3">Ai restricții alimentare sau preferințe speciale?</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button class="opt-btn" onclick="selectDiet('none', this)">Nicio restricție</button>
+          <button class="opt-btn" onclick="selectDiet('vegetarian', this)">🌿 Vegetarian</button>
+          <button class="opt-btn" onclick="selectDiet('vegan', this)">🌱 Vegan</button>
+          <button class="opt-btn" onclick="selectDiet('other', this)">✏️ Altceva</button>
+        </div>
+        <div id="diet-other-wrap" class="relative hidden">
+          <input class="cyber-input" type="text" id="diet-other-input" placeholder="// Specifică alergia / restricția" oninput="checkDietOther()" autocomplete="off"/>
+        </div>
+        <button class="cyber-button py-3 px-6 text-primary w-full transition-all" id="diet-next" style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:0.2em;font-weight:700;opacity:0.35;pointer-events:none" onclick="submitDiet()">
+          TRIMITE &nbsp;→
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUCCESS PAGE
+══════════════════════════════════════ -->
+<div id="page-success" class="page flex-grow flex-col items-center justify-center pt-24 pb-20 px-5 z-10">
+  <div class="max-w-md w-full flex flex-col items-center gap-6">
+    <div class="cyber-border p-8 flex flex-col items-center gap-6 w-full text-center">
+      <div id="success-icon-wrap" class="w-20 h-20 flex items-center justify-center border-2 border-[#00dbe7] rounded-full" style="box-shadow:0 0 30px rgba(0,219,231,0.4)">
+        <span class="material-symbols-outlined text-[#00dbe7]" id="success-icon" style="font-size:2.8rem">check_circle</span>
+      </div>
+      <h2 class="glitch-text text-primary uppercase tracking-widest" style="font-family:Sora;font-size:26px;font-weight:800" id="success-title">ÎNREGISTRAT</h2>
+      <p class="text-[#b9cacb]" style="font-family:'JetBrains Mono';font-size:14px;line-height:1.8" id="success-msg">
+        Răspunsul tău a fost transmis cu succes.<br/>Ne vedem pe 20 iunie! 🎉
+      </p>
+      <div class="cyber-border p-3 w-full">
+        <span class="text-[#00e639] blinking-cursor" style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:0.1em">TRANSMISSION COMPLETE</span>
+      </div>
+    </div>
+    <button class="cyber-button py-3 px-8 text-[#b9cacb] w-full" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.2em" onclick="goBack()">← ÎNAPOI LA INVITAȚIE</button>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay" class="fixed inset-0 z-[200] bg-[#131313]/90 backdrop-blur-sm items-center justify-center flex-col gap-4" style="display:none">
+  <div class="cyber-border p-8 flex flex-col items-center gap-4">
+    <div class="flex gap-2">
+      <div class="load-dot w-2 h-2 rounded-full bg-[#00dbe7]"></div>
+      <div class="load-dot w-2 h-2 rounded-full bg-[#00dbe7]"></div>
+      <div class="load-dot w-2 h-2 rounded-full bg-[#00dbe7]"></div>
+    </div>
+    <span class="text-[#00dbe7]" style="font-family:'JetBrains Mono';font-size:12px;letter-spacing:0.2em">TRANSMITTING DATA...</span>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="w-full py-3 px-5 md:px-10 flex flex-col md:flex-row justify-between items-center gap-3 bg-[#0e0e0e] border-t border-[#3a494b] z-50 relative">
+  <div class="text-[#e5e2e1]" style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.15em">
+    SYSTEM STATUS: <span class="text-[#00e639] blinking-cursor">ONLINE</span> // DODO-18-PROTOCOL
+  </div>
+  <div class="text-[#849495]" style="font-family:'JetBrains Mono';font-size:11px">20.06.2026 // 20:00 // SIGNATURE EVENTS</div>
+</footer>
+
+<script>
+// ─── SUPABASE ───────────────────────────────
+const { createClient } = supabase;
+const db = createClient(
+  'https://dqujculxbyxdivazphsp.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxdWpjdWx4Ynl4ZGl2YXpwaHNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMDgwMTIsImV4cCI6MjA5NDc4NDAxMn0.aZMJREvxak_IgH_TdELDr13ZB9kxmnVDqtqvkrn5smg'
+);
+
+// ─── COUNTDOWN ──────────────────────────────
+function updateCountdown() {
+  const target = new Date('2026-06-20T20:00:00');
+  const now    = new Date();
+  const diff   = target - now;
+  const pad    = n => String(Math.max(0,n)).padStart(2,'0');
+  if (diff <= 0) {
+    ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => document.getElementById(id).textContent = '00');
+    return;
+  }
+  document.getElementById('cd-days').textContent  = pad(Math.floor(diff / 86400000));
+  document.getElementById('cd-hours').textContent = pad(Math.floor((diff % 86400000) / 3600000));
+  document.getElementById('cd-mins').textContent  = pad(Math.floor((diff % 3600000) / 60000));
+  document.getElementById('cd-secs').textContent  = pad(Math.floor((diff % 60000) / 1000));
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// ─── STATE & NAV ────────────────────────────
+let state = { name:'', attending:null, diet:'', dietOther:'' };
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+
+function goToForm() {
+  showPage('page-form');
+  resetForm();
+  showQ(0);
+}
+
+function goBack() {
+  showPage('page-landing');
+  resetForm();
+}
+
+function resetForm() {
+  state = { name:'', attending:null, diet:'', dietOther:'' };
+  document.querySelectorAll('.q-slide').forEach(q => q.classList.remove('active'));
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  const nameIn = document.getElementById('name-input');
+  const dietIn = document.getElementById('diet-other-input');
+  if (nameIn) nameIn.value = '';
+  if (dietIn) dietIn.value = '';
+  document.getElementById('diet-other-wrap').classList.add('hidden');
+  setBtnEnabled('name-next', false);
+  setBtnEnabled('diet-next', false);
+  setProgress(0);
+}
+
+function showQ(n) {
+  document.querySelectorAll('.q-slide').forEach(q => q.classList.remove('active'));
+  const q = document.getElementById('q' + n);
+  if (q) q.classList.add('active');
+  setProgress(n);
+}
+
+function setProgress(step) {
+  document.getElementById('progress-bar').style.width = Math.round((step/3)*100) + '%';
+  document.getElementById('progress-label').textContent = `STEP ${step} / 3`;
+}
+
+function setBtnEnabled(id, on) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (on) { el.style.opacity = '1'; el.style.pointerEvents = 'auto'; }
+  else     { el.style.opacity = '0.35'; el.style.pointerEvents = 'none'; }
+}
+
+// ─── Q0 ─────────────────────────────────────
+function checkName() {
+  setBtnEnabled('name-next', document.getElementById('name-input').value.trim().length >= 2);
+}
+function submitName() {
+  state.name = document.getElementById('name-input').value.trim();
+  if (state.name) showQ(1);
+}
+
+// ─── Q1 ─────────────────────────────────────
+function selectAttend(val, btn) {
+  document.querySelectorAll('#q1 .opt-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.attending = val;
+  setTimeout(() => val ? showQ(2) : submitResponse(), 380);
+}
+
+// ─── Q2 ─────────────────────────────────────
+function selectDiet(val, btn) {
+  document.querySelectorAll('#q2 .opt-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.diet = val;
+  const wrap = document.getElementById('diet-other-wrap');
+  if (val === 'other') {
+    wrap.classList.remove('hidden');
+    setBtnEnabled('diet-next', false);
+  } else {
+    wrap.classList.add('hidden');
+    setBtnEnabled('diet-next', true);
+  }
+}
+function checkDietOther() {
+  setBtnEnabled('diet-next', document.getElementById('diet-other-input').value.trim().length >= 2);
+}
+function submitDiet() {
+  if (state.diet === 'other') state.dietOther = document.getElementById('diet-other-input').value.trim();
+  submitResponse();
+}
+
+// ─── SUBMIT ──────────────────────────────────
+async function submitResponse() {
+  const overlay = document.getElementById('loading-overlay');
+  overlay.style.display = 'flex';
+
+  const payload = {
+    name: state.name,
+    attending: state.attending,
+    diet: state.attending ? (state.diet === 'other' ? state.dietOther : state.diet) : null,
+    submitted_at: new Date().toISOString()
+  };
+
+  try {
+    const { error } = await db.from('rsvp').insert([payload]);
+    if (error) console.error('Supabase error:', error);
+  } catch(e) { console.error(e); }
+
+  await new Promise(r => setTimeout(r, 900));
+  overlay.style.display = 'none';
+
+  // Configure success state
+  const iconEl  = document.getElementById('success-icon');
+  const iconWrap = document.getElementById('success-icon-wrap');
+  const titleEl = document.getElementById('success-title');
+  const msgEl   = document.getElementById('success-msg');
+
+  if (state.attending) {
+    iconEl.textContent = 'check_circle';
+    iconEl.style.color = '#00dbe7';
+    iconWrap.style.borderColor = '#00dbe7';
+    iconWrap.style.boxShadow = '0 0 30px rgba(0,219,231,0.4)';
+    titleEl.textContent = 'ÎNREGISTRAT';
+    titleEl.style.color = '#e1fdff';
+    msgEl.innerHTML = 'Răspunsul tău a fost transmis cu succes.<br/>Ne vedem pe 20 iunie! 🎉';
+    msgEl.style.color = '#b9cacb';
+  } else {
+    iconEl.textContent = 'cancel';
+    iconEl.style.color = '#ff6eb4';
+    iconWrap.style.borderColor = '#ff006e';
+    iconWrap.style.boxShadow = '0 0 30px rgba(255,0,110,0.4)';
+    titleEl.textContent = 'NOTĂ PRIMITĂ';
+    titleEl.style.color = '#ff6eb4';
+    msgEl.textContent = 'Înțeleg, ne pare rău că nu poți veni. Poate data viitoare! 🤖';
+    msgEl.style.color = '#b9cacb';
+  }
+
+  setProgress(3);
+  showPage('page-success');
+}
+</script>
+</body>
+</html>
